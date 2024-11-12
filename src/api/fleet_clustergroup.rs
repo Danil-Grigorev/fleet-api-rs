@@ -312,6 +312,9 @@ pub struct ClusterGroupStatusSummaryNonReadyResourcesModifiedStatus {
     pub api_version: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub delete: Option<bool>,
+    /// Exist is true if the resource exists but is not owned by us. This can happen if a resource was adopted by another bundle whereas the first bundle still exists and due to that reports that it does not own it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exist: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kind: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
