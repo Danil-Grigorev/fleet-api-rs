@@ -17,13 +17,17 @@ generate: _create-out-dir update-version && fmt
     #!/usr/bin/env bash
     set -euxo pipefail
     version=`just current-version ".fleet_api.tag"`
-    just _generate-kopium-url kopium "https://raw.githubusercontent.com/rancher/fleet/${version}/charts/fleet-crd/templates/crds.yaml" "src/api/fleet_cluster.rs" "select(.spec.names.singular==\"cluster\")" "--no-condition"
-    just _generate-kopium-url kopium "https://raw.githubusercontent.com/rancher/fleet/${version}/charts/fleet-crd/templates/crds.yaml" "src/api/fleet_clustergroup.rs" "select(.spec.names.singular==\"clustergroup\")" "--no-condition"
-    just _generate-kopium-url kopium "https://raw.githubusercontent.com/rancher/fleet/${version}/charts/fleet-crd/templates/crds.yaml" "src/api/fleet_cluster_registration_token.rs" "select(.spec.names.singular==\"clusterregistrationtoken\")" ""
+    just _generate-default-kopium-url kopium "https://raw.githubusercontent.com/rancher/fleet/${version}/charts/fleet-crd/templates/crds.yaml" "src/api/fleet_cluster.rs" "select(.spec.names.singular==\"cluster\")" "--no-condition"
+    just _generate-default-kopium-url kopium "https://raw.githubusercontent.com/rancher/fleet/${version}/charts/fleet-crd/templates/crds.yaml" "src/api/fleet_clustergroup.rs" "select(.spec.names.singular==\"clustergroup\")" "--no-condition"
+    just _generate-default-kopium-url kopium "https://raw.githubusercontent.com/rancher/fleet/${version}/charts/fleet-crd/templates/crds.yaml" "src/api/fleet_cluster_registration_token.rs" "select(.spec.names.singular==\"clusterregistrationtoken\")" ""
+
+[private]
+_generate-default-kopium-url kpath="" source="" dest="" yqexp="." condition="": _download-yq _install-kopium
+    curl -sSL {{source}} | yq '{{yqexp}}' | {{kpath}} -D Default -D PartialEq {{condition}} -A -d -f - > {{dest}}
 
 [private]
 _generate-kopium-url kpath="" source="" dest="" yqexp="." condition="": _download-yq _install-kopium
-    curl -sSL {{source}} | yq '{{yqexp}}' | {{kpath}} -D Default {{condition}} -A -d -f - > {{dest}}
+    curl -sSL {{source}} | yq '{{yqexp}}' | {{kpath}} -D PartialEq {{condition}} -A -d -f - > {{dest}}
 
 current-version path: _download-yq
     cat version.yaml | yq '{{path}}'

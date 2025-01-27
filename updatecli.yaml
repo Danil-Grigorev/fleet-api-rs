@@ -9,7 +9,7 @@ sources:
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       versionFilter:
         kind: semver
-        pattern: =>v0.11.3
+        pattern: =>v0.11.2
 targets:
   versionFile:
     name: Bump fleet version
@@ -20,11 +20,11 @@ targets:
   updatecli:
     name: Bump fleet version in updatecli pattern
     kind: yaml
+    transformers:
+    - addprefix: "=>"
     spec:
       key: $.sources.sourceid.spec.versionFilter.pattern
       file: updatecli.yaml
-    transformers:
-      - addprefix: "=>"
   packageFile:
     name: Sync fleet-api-rs version
     kind: toml
@@ -33,10 +33,3 @@ targets:
       file: Cargo.toml
     transformers:
       - trimprefix: "v"
-  commit:
-    name: Add and commit the changes
-    kind: shell
-    spec:
-      command: just add-and-commit
-      environments:
-        - name: PATH
